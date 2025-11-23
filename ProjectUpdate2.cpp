@@ -668,7 +668,7 @@ void drawStool(float x, float y, float width, float height) {
     glEnd();
 }
 
-void drawPendantLamp(float x, float y) {
+void drawPendantLamp(float x, float y) { // wtf is pendant lamp
     Color edge = { 0.2f, 0.2f, 0.2f };
     Color shade = { 0.95f, 0.85f, 0.7f };
 
