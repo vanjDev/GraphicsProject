@@ -682,7 +682,8 @@ void drawPendantLamp(float x, float y) {
     glColor4f(1.0f, 0.95f, 0.7f, 0.3f);
     drawCircleFilled(x, y - 35, 20);
 }
-
+/*
+// Wall clock 
 void drawWallClock(float x, float y, float radius) {
     Color edge = { 0.2f, 0.2f, 0.2f };
     Color face = { 0.98f, 0.98f, 0.95f };
@@ -718,7 +719,9 @@ void drawWallClock(float x, float y, float radius) {
     setColor({ 0.8f, 0.3f, 0.3f });
     drawCircleFilled(x, y, 5);
 }
+*/
 
+// Small chalkboard menu with lines and dots
 void drawChalkboardMenu(float x, float y, float w, float h) {
     Color edge = { 0.4f, 0.3f, 0.2f };
     Color board = { 0.15f, 0.15f, 0.15f };
@@ -773,6 +776,7 @@ void drawMug(float x, float y, Color fill) {
     glEnd();
 }
 
+/*
 void drawBookshelf(float x, float y) {
     Color wood = { 0.55f, 0.35f, 0.20f };
     Color woodLight = { 0.65f, 0.45f, 0.30f };
@@ -827,7 +831,9 @@ void drawBookshelf(float x, float y) {
         }
     }
 }
+*/
 
+/*
 void drawEntryArea(float x, float y) {
     Color edge = { 0.06f, 0.03f, 0.01f };
     Color doorWood = { 0.55f, 0.35f, 0.20f };
@@ -855,6 +861,7 @@ void drawEntryArea(float x, float y) {
     }
     drawFilledRect(boardX + 45, boardY + 190, 110, 10, { 0.9f, 0.9f, 0.9f }, { 0.9f, 0.9f, 0.9f }, 0.5f);
 }
+*/
 
 void drawCouchArea(float x, float y) {
     Color edge = { 0.06f, 0.03f, 0.01f };
@@ -900,16 +907,18 @@ void drawScenePixels() {
     float midY = windowHeight * 0.52f;
     float upperY = windowHeight * 0.58f;
 
-    drawEntryArea(30, baseY);
-    drawBookshelf(680, windowHeight * 0.45f);
-    drawPlantPixel(660, baseY, (plantColorIndex + 2) % numPlantColors);
+    // drawEntryArea(30, baseY);
+    // drawBookshelf(680, windowHeight * 0.45f);
+    drawPlantPixel(660, baseY, (plantColorIndex + 2) % numPlantColors); // Middle plant
     
     drawWindowPixel(250, midY, 220, 260, curtainOpenAmount); // Window
     
+    /*
     float tableX = 280; // Table and stools
     drawTable(tableX, baseY, 100, 90);
     drawStool(tableX - 50, baseY, 40, 60);
     drawStool(tableX + 110, baseY, 40, 60);
+    */
     
     float counterX = 1150; // Counter setup
     float counterW = windowWidth * 0.52f;
@@ -940,11 +949,11 @@ void drawScenePixels() {
     drawPendantLamp(counterX + 200, windowHeight - 30); // Pendant lamps
     drawPendantLamp(counterX + 450, windowHeight - 30);
     
-    drawWallClock(900, windowHeight * 0.75f, 35);  // Wall clock and menu board
+    // drawWallClock(900, windowHeight * 0.75f, 35);  // Wall clock and menu board
     drawChalkboardMenu(500, windowHeight * 0.55f, 140, 180);
     
-    drawPlantPixel(950, baseY, plantColorIndex); // Plants
-    drawPlantPixel(200, baseY, (plantColorIndex + 1) % numPlantColors);
+	drawPlantPixel(950, baseY, plantColorIndex); // Right plant
+	// drawPlantPixel(200, baseY, (plantColorIndex + 1) % numPlantColors); // Left plant
     
     drawFilledRect(1850, 12.0f, 200, 60, { 0.99f, 0.75f, 0.79f }, edge, 2.0f); // Shelf decoration
     drawFilledRect(2020, 18.0f, 40, 18, { 0.64f, 0.73f, 0.56f }, edge, 1.2f);
