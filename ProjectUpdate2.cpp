@@ -28,7 +28,7 @@ float catColors[][3] = {
     {0.3f, 0.3f, 0.3f}, {1.0f, 1.0f, 1.0f}, {0.2f, 0.2f, 0.2f}
 };
 int numCatColors = 5;
-float catRotationAngle = 0.0f; // Cat rotation angle in degrees
+float catRotationAngle = 0.0f; // Cat rotation -- UUIAIAIAIEI
 
 int plantColorIndex = 0;
 float plantColors[][3] = {
@@ -37,7 +37,7 @@ float plantColors[][3] = {
 int numPlantColors = 5;
 
 float curtainOpenAmount = 0.0f;
-float couchScale = 1.0f; // Couch scale factor (controlled by scroll wheel)
+float couchScale = 1.0f; // Couch size (controlled by scroll wheel)
 
 struct Color { GLfloat r, g, b; };
 
@@ -48,32 +48,32 @@ inline void setColor(const Color& c) {
     glColor3f(c.r, c.g, c.b);
 }
 
-void drawFilledRect(float x, float y, float w, float h, const Color& fill, const Color& outline, float outlineWidth = 2.0f) {
+void drawFilledRect(float x, float y, float width, float height, const Color& fill, const Color& outline, float outlineWidth = 2.0f) {
     setColor(fill);
     glBegin(GL_QUADS);
     glVertex2f(x, y);
-    glVertex2f(x + w, y);
-    glVertex2f(x + w, y + h);
-    glVertex2f(x, y + h);
+    glVertex2f(x + width, y);
+    glVertex2f(x + width, y + height);
+    glVertex2f(x, y + height);
     glEnd();
 
     glLineWidth(outlineWidth);
     setColor(outline);
     glBegin(GL_LINE_LOOP);
     glVertex2f(x, y);
-    glVertex2f(x + w, y);
-    glVertex2f(x + w, y + h);
-    glVertex2f(x, y + h);
+    glVertex2f(x + width, y);
+    glVertex2f(x + width, y + height);
+    glVertex2f(x, y + height);
     glEnd();
 }
 
-void drawCircleFilled(float cx, float cy, float r, int segs = 16) {
+void drawCircleFilled(float centerX, float centerY, float radius, int segments = 16) {
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(cx, cy);
-    const float step = TWO_PI / segs;
-    for (int i = 0; i <= segs; i++) {
-        float a = i * step;
-        glVertex2f(cx + cosf(a) * r, cy + sinf(a) * r);
+    glVertex2f(centerX, centerY);
+    const float step = TWO_PI / segments;
+    for (int segmentIndex = 0; segmentIndex <= segments; segmentIndex++) {
+        float angle = segmentIndex * step;
+        glVertex2f(centerX + cosf(angle) * radius, centerY + sinf(angle) * radius);
     }
     glEnd();
 }
@@ -86,13 +86,13 @@ void drawTriangleFilled(float x1, float y1, float x2, float y2, float x3, float 
     glEnd();
 }
 
-void drawEllipse(float cx, float cy, float rx, float ry, int segs = 16) {
+void drawEllipse(float centerX, float centerY, float radiusX, float radiusY, int segments = 16) {
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(cx, cy);
-    const float step = TWO_PI / segs;
-    for (int i = 0; i <= segs; i++) {
-        float a = i * step;
-        glVertex2f(cx + cosf(a) * rx, cy + sinf(a) * ry);
+    glVertex2f(centerX, centerY);
+    const float step = TWO_PI / segments;
+    for (int segmentIndex = 0; segmentIndex <= segments; segmentIndex++) {
+        float angle = segmentIndex * step;
+        glVertex2f(centerX + cosf(angle) * radiusX, centerY + sinf(angle) * radiusY);
     }
     glEnd();
 }
@@ -185,24 +185,24 @@ void drawBrownCoffeeMakerStyled(float x, float y, float scale) {
     drawFilledRect(x + 15 * scale, y + 10 * scale, 40 * scale, 50 * scale, { 0.55f, 0.35f, 0.20f }, edge, 1.5f);
 }
 
-void drawCounterStyled(float x, float y, float w, float h) {
+void drawCounterStyled(float x, float y, float width, float height) {
     Color edge = { 0.0f, 0.0f, 0.0f };
     Color wood = { 0.8f, 0.6f, 0.4f };
-    drawFilledRect(x, y, w, h, wood, edge, 1.5f);
+    drawFilledRect(x, y, width, height, wood, edge, 1.5f);
 
     setColor(edge);
-    float lineSpacing = h * 0.25f;
-    for (int i = 1; i < 4; i++) {
+    float lineSpacing = height * 0.25f;
+    for (int lineIndex = 1; lineIndex < 4; lineIndex++) {
         glBegin(GL_LINES);
-        glVertex2f(x, y + i * lineSpacing);
-        glVertex2f(x + w - 20, y + i * lineSpacing);
+        glVertex2f(x, y + lineIndex * lineSpacing);
+        glVertex2f(x + width - 20, y + lineIndex * lineSpacing);
         glEnd();
     }
 }
 
-void drawCountertopStyled(float x, float y, float w, float h) {
+void drawCountertopStyled(float x, float y, float width, float height) {
     Color edge = { 0.0f, 0.0f, 0.0f };
-    drawFilledRect(x, y, w, h, { 0.8f, 0.6f, 0.4f }, edge, 1.5f);
+    drawFilledRect(x, y, width, height, { 0.8f, 0.6f, 0.4f }, edge, 1.5f);
 }
 
 inline Color darken(const Color& c, float factor = 0.7f) {
@@ -217,62 +217,62 @@ inline Color lighten(const Color& c, float factor = 1.2f) {
     };
 }
 
-void drawCatPixel(float cx, float cy, float scale, int colorIndex, float rotationAngle = 0.0f) {
+void drawCatPixel(float centerX, float centerY, float scale, int colorIndex, float rotationAngle = 0.0f) {
     Color body = { catColors[colorIndex][0], catColors[colorIndex][1], catColors[colorIndex][2] };
     Color darker = darken(body);
     Color lighter = lighten(body);
 
-    // Apply rotation around the center point
+    // Apply rotation around the center point of the cat
     glPushMatrix();
-    glTranslatef(cx, cy, 0.0f);
+    glTranslatef(centerX, centerY, 0.0f);
     glRotatef(rotationAngle, 0.0f, 0.0f, 1.0f);
-    glTranslatef(-cx, -cy, 0.0f);
+    glTranslatef(-centerX, -centerY, 0.0f);
 
     setColor(body);
-    drawEllipse(cx, cy, 32 * scale, 28 * scale);
+    drawEllipse(centerX, centerY, 32 * scale, 28 * scale);
     setColor(lighter);
-    drawEllipse(cx - 5 * scale, cy - 8 * scale, 18 * scale, 20 * scale);
+    drawEllipse(centerX - 5 * scale, centerY - 8 * scale, 18 * scale, 20 * scale);
     setColor(body);
-    drawCircleFilled(cx - 22 * scale, cy + 22 * scale, 20 * scale);
+    drawCircleFilled(centerX - 22 * scale, centerY + 22 * scale, 20 * scale);
     setColor(lighter);
-    drawEllipse(cx - 22 * scale, cy + 18 * scale, 14 * scale, 12 * scale);
+    drawEllipse(centerX - 22 * scale, centerY + 18 * scale, 14 * scale, 12 * scale);
 
     setColor(body);
-    drawTriangleFilled(cx - 36 * scale, cy + 34 * scale, cx - 28 * scale, cy + 50 * scale, cx - 20 * scale, cy + 36 * scale);
-    drawTriangleFilled(cx - 24 * scale, cy + 34 * scale, cx - 16 * scale, cy + 50 * scale, cx - 8 * scale, cy + 36 * scale);
+    drawTriangleFilled(centerX - 36 * scale, centerY + 34 * scale, centerX - 28 * scale, centerY + 50 * scale, centerX - 20 * scale, centerY + 36 * scale);
+    drawTriangleFilled(centerX - 24 * scale, centerY + 34 * scale, centerX - 16 * scale, centerY + 50 * scale, centerX - 8 * scale, centerY + 36 * scale);
 
     setColor({ 0.95f, 0.7f, 0.7f });
-    drawTriangleFilled(cx - 33 * scale, cy + 36 * scale, cx - 28 * scale, cy + 45 * scale, cx - 23 * scale, cy + 37 * scale);
-    drawTriangleFilled(cx - 21 * scale, cy + 36 * scale, cx - 16 * scale, cy + 45 * scale, cx - 11 * scale, cy + 37 * scale);
+    drawTriangleFilled(centerX - 33 * scale, centerY + 36 * scale, centerX - 28 * scale, centerY + 45 * scale, centerX - 23 * scale, centerY + 37 * scale);
+    drawTriangleFilled(centerX - 21 * scale, centerY + 36 * scale, centerX - 16 * scale, centerY + 45 * scale, centerX - 11 * scale, centerY + 37 * scale);
 
     setColor({ 1.0f, 1.0f, 0.9f });
-    drawEllipse(cx - 28 * scale, cy + 24 * scale, 4 * scale, 5 * scale);
-    drawEllipse(cx - 16 * scale, cy + 24 * scale, 4 * scale, 5 * scale);
+    drawEllipse(centerX - 28 * scale, centerY + 24 * scale, 4 * scale, 5 * scale);
+    drawEllipse(centerX - 16 * scale, centerY + 24 * scale, 4 * scale, 5 * scale);
 
     setColor({ 0.1f, 0.1f, 0.1f });
-    drawEllipse(cx - 28 * scale, cy + 24 * scale, 2 * scale, 4 * scale);
-    drawEllipse(cx - 16 * scale, cy + 24 * scale, 2 * scale, 4 * scale);
+    drawEllipse(centerX - 28 * scale, centerY + 24 * scale, 2 * scale, 4 * scale);
+    drawEllipse(centerX - 16 * scale, centerY + 24 * scale, 2 * scale, 4 * scale);
 
     setColor({ 0.9f, 0.6f, 0.6f });
-    drawTriangleFilled(cx - 22 * scale, cy + 18 * scale, cx - 20 * scale, cy + 14 * scale, cx - 24 * scale, cy + 14 * scale);
+    drawTriangleFilled(centerX - 22 * scale, centerY + 18 * scale, centerX - 20 * scale, centerY + 14 * scale, centerX - 24 * scale, centerY + 14 * scale);
 
     glLineWidth(1.0f);
     setColor({ 0.3f, 0.3f, 0.3f });
     glBegin(GL_LINES);
-    glVertex2f(cx - 22 * scale, cy + 16 * scale); glVertex2f(cx - 40 * scale, cy + 18 * scale);
-    glVertex2f(cx - 22 * scale, cy + 16 * scale); glVertex2f(cx - 40 * scale, cy + 14 * scale);
-    glVertex2f(cx - 22 * scale, cy + 16 * scale); glVertex2f(cx - 4 * scale, cy + 18 * scale);
-    glVertex2f(cx - 22 * scale, cy + 16 * scale); glVertex2f(cx - 4 * scale, cy + 14 * scale);
+    glVertex2f(centerX - 22 * scale, centerY + 16 * scale); glVertex2f(centerX - 40 * scale, centerY + 18 * scale);
+    glVertex2f(centerX - 22 * scale, centerY + 16 * scale); glVertex2f(centerX - 40 * scale, centerY + 14 * scale);
+    glVertex2f(centerX - 22 * scale, centerY + 16 * scale); glVertex2f(centerX - 4 * scale, centerY + 18 * scale);
+    glVertex2f(centerX - 22 * scale, centerY + 16 * scale); glVertex2f(centerX - 4 * scale, centerY + 14 * scale);
     glEnd();
 
     setColor(body);
-    drawEllipse(cx - 12 * scale, cy - 22 * scale, 8 * scale, 6 * scale);
-    drawEllipse(cx + 8 * scale, cy - 22 * scale, 8 * scale, 6 * scale);
-    drawCircleFilled(cx + 24 * scale, cy - 4 * scale, 10 * scale);
-    drawCircleFilled(cx + 32 * scale, cy - 12 * scale, 9 * scale);
-    drawCircleFilled(cx + 38 * scale, cy - 20 * scale, 8 * scale);
+    drawEllipse(centerX - 12 * scale, centerY - 22 * scale, 8 * scale, 6 * scale);
+    drawEllipse(centerX + 8 * scale, centerY - 22 * scale, 8 * scale, 6 * scale);
+    drawCircleFilled(centerX + 24 * scale, centerY - 4 * scale, 10 * scale);
+    drawCircleFilled(centerX + 32 * scale, centerY - 12 * scale, 9 * scale);
+    drawCircleFilled(centerX + 38 * scale, centerY - 20 * scale, 8 * scale);
     setColor(darker);
-    drawCircleFilled(cx + 42 * scale, cy - 26 * scale, 6 * scale);
+    drawCircleFilled(centerX + 42 * scale, centerY - 26 * scale, 6 * scale);
 
     glPopMatrix(); // Restore matrix state after rotation
 }
@@ -307,22 +307,22 @@ void drawSleepingCatPixel(float x, float y, float scale) {
     drawCircleFilled(x - 26 * scale, y + 10 * scale, 6 * scale);
 }
 
-void drawPlantPixel(float cx, float cy, int colorIndex) {
+void drawPlantPixel(float centerX, float centerY, int colorIndex) {
     Color edge = { 0.06f, 0.03f, 0.01f };
     Color potColor = { 0.79f, 0.37f, 0.18f };
     Color potHighlight = { 0.89f, 0.47f, 0.28f };
 
-    drawFilledRect(cx - 40, cy - 40, 80, 40, potColor, edge, 2.0f);
-    drawFilledRect(cx - 42, cy - 2, 84, 8, potHighlight, edge, 1.5f);
+    drawFilledRect(centerX - 40, centerY - 40, 80, 40, potColor, edge, 2.0f);
+    drawFilledRect(centerX - 42, centerY - 2, 84, 8, potHighlight, edge, 1.5f);
 
     setColor(potHighlight);
     glBegin(GL_TRIANGLES);
-    glVertex2f(cx - 30, cy - 35);
-    glVertex2f(cx - 20, cy - 35);
-    glVertex2f(cx - 25, cy - 10);
+    glVertex2f(centerX - 30, centerY - 35);
+    glVertex2f(centerX - 20, centerY - 35);
+    glVertex2f(centerX - 25, centerY - 10);
     glEnd();
 
-    drawFilledRect(cx - 36, cy - 6, 72, 8, { 0.4f, 0.3f, 0.2f }, edge, 1.0f);
+    drawFilledRect(centerX - 36, centerY - 6, 72, 8, { 0.4f, 0.3f, 0.2f }, edge, 1.0f);
 
     Color leafColor = { plantColors[colorIndex][0], plantColors[colorIndex][1], plantColors[colorIndex][2] };
     Color leafDark = darken(leafColor);
@@ -331,13 +331,13 @@ void drawPlantPixel(float cx, float cy, int colorIndex) {
     glLineWidth(3.0f);
     setColor({ 0.2f, 0.5f, 0.2f });
     glBegin(GL_LINES);
-    glVertex2f(cx, cy); glVertex2f(cx, cy + 45);
-    glVertex2f(cx, cy + 20); glVertex2f(cx - 35, cy + 25);
-    glVertex2f(cx, cy + 20); glVertex2f(cx + 35, cy + 25);
+    glVertex2f(centerX, centerY); glVertex2f(centerX, centerY + 45);
+    glVertex2f(centerX, centerY + 20); glVertex2f(centerX - 35, centerY + 25);
+    glVertex2f(centerX, centerY + 20); glVertex2f(centerX + 35, centerY + 25);
     glEnd();
 
     struct Leaf { float x, y, angle, size; };
-    Leaf leaves[] = { {cx, cy + 45, -15, 1.2f}, {cx - 40, cy + 20, 10, 1.0f}, {cx + 40, cy + 20, 20, 1.0f} };
+    Leaf leaves[] = { {centerX, centerY + 45, -15, 1.2f}, {centerX - 40, centerY + 20, 10, 1.0f}, {centerX + 40, centerY + 20, 20, 1.0f} };
 
     for (auto& leaf : leaves) {
         glPushMatrix();
@@ -347,11 +347,11 @@ void drawPlantPixel(float cx, float cy, int colorIndex) {
         setColor(leafColor);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0, 0);
-        for (int i = 0; i <= 12; i++) {
-            float a = (float)i / 12.0f * TWO_PI;
-            float r = 28 * leaf.size;
-            if (i % 3 == 0) r *= 0.7f;
-            glVertex2f(cosf(a) * r, sinf(a) * r);
+        for (int segmentIndex = 0; segmentIndex <= 12; segmentIndex++) {
+            float angle = (float)segmentIndex / 12.0f * TWO_PI;
+            float radius = 28 * leaf.size;
+            if (segmentIndex % 3 == 0) radius *= 0.7f;
+            glVertex2f(cosf(angle) * radius, sinf(angle) * radius);
         }
         glEnd();
 
@@ -401,30 +401,30 @@ void drawTreeThroughWindow(float x, float y, float scale) {
     glEnd();
 }
 
-void drawWindowPixel(float x, float y, float w, float h, float openAmount) {
+void drawWindowPixel(float x, float y, float width, float height, float openAmount) {
     Color frame = { 0.73f, 0.56f, 0.36f };
     Color glass = { 0.68f, 0.85f, 0.90f };
 
-    drawFilledRect(x, y, w, h, frame, { 0.06f, 0.03f, 0.01f }, 2.0f);
-    drawFilledRect(x + 8, y + 8, w - 16, h - 16, glass, { 0.06f, 0.03f, 0.01f }, 1.2f);
+    drawFilledRect(x, y, width, height, frame, { 0.06f, 0.03f, 0.01f }, 2.0f);
+    drawFilledRect(x + 8, y + 8, width - 16, height - 16, glass, { 0.06f, 0.03f, 0.01f }, 1.2f);
 
-    drawTreeThroughWindow(x + w * 0.5f, y + 20, 1.2f);
+    drawTreeThroughWindow(x + width * 0.5f, y + 20, 1.2f);
 
     glLineWidth(3.0f);
     setColor({ 0.73f, 0.56f, 0.36f });
     glBegin(GL_LINES);
-    glVertex2f(x + w * 0.5f, y + 8); glVertex2f(x + w * 0.5f, y + h - 8);
-    glVertex2f(x + 8, y + h * 0.5f); glVertex2f(x + w - 8, y + h * 0.5f);
+    glVertex2f(x + width * 0.5f, y + 8); glVertex2f(x + width * 0.5f, y + height - 8);
+    glVertex2f(x + 8, y + height * 0.5f); glVertex2f(x + width - 8, y + height * 0.5f);
     glEnd();
 
-    drawFilledRect(x - 10, y + h - 12, w + 20, 6, frame, { 0.06f, 0.03f, 0.01f }, 1.5f);
+    drawFilledRect(x - 10, y + height - 12, width + 20, 6, frame, { 0.06f, 0.03f, 0.01f }, 1.5f);
 
-    for (float cx = x + 12; cx <= x + w - 12; cx += 48)
-        drawCircleFilled(cx, y + h - 9, 6);
+    for (float centerX = x + 12; centerX <= x + width - 12; centerX += 48)
+        drawCircleFilled(centerX, y + height - 9, 6);
 
-    float offset = openAmount * w * 0.35f;
-    drawFilledRect(x + 10 - offset, y + 10, w * 0.5f - 14, h - 20, { 0.95f, 0.95f, 0.95f }, { 0.9f, 0.9f, 0.9f }, 1.0f);
-    drawFilledRect(x + w * 0.5f + 4 + offset, y + 10, w * 0.5f - 14, h - 20, { 0.95f, 0.95f, 0.95f }, { 0.9f, 0.9f, 0.9f }, 1.0f);
+    float offset = openAmount * width * 0.35f;
+    drawFilledRect(x + 10 - offset, y + 10, width * 0.5f - 14, height - 20, { 0.95f, 0.95f, 0.95f }, { 0.9f, 0.9f, 0.9f }, 1.0f);
+    drawFilledRect(x + width * 0.5f + 4 + offset, y + 10, width * 0.5f - 14, height - 20, { 0.95f, 0.95f, 0.95f }, { 0.9f, 0.9f, 0.9f }, 1.0f);
 }
 
 void drawCashRegisterPixel(float x, float y, float scale) {
@@ -447,9 +447,9 @@ void drawCashRegisterPixel(float x, float y, float scale) {
 
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++) {
-            float kx = x + 12 * scale + col * 9 * scale;
-            float ky = y + 6 * scale + row * 8 * scale;
-            drawFilledRect(kx, ky, 7 * scale, 6 * scale, keyColor, edge, 0.8f);
+            float keyX = x + 12 * scale + col * 9 * scale;
+            float keyY = y + 6 * scale + row * 8 * scale;
+            drawFilledRect(keyX, keyY, 7 * scale, 6 * scale, keyColor, edge, 0.8f);
         }
     }
 
@@ -461,96 +461,102 @@ void drawCashRegisterPixel(float x, float y, float scale) {
     drawFilledRect(x + 35 * scale, y - 1 * scale, 20 * scale, 3 * scale, { 0.5f, 0.5f, 0.5f }, edge, 0.5f);
 }
 
-void drawJar(float x, float y, float w, float h, Color fill) {
+void drawJar(float x, float y, float width, float height, Color fill) {
     Color edge = { 0.2f, 0.2f, 0.2f };
 
     setColor(fill);
     glBegin(GL_QUADS);
     glVertex2f(x + 2, y);
-    glVertex2f(x + w - 2, y);
-    glVertex2f(x + w, y + h);
-    glVertex2f(x, y + h);
+    glVertex2f(x + width - 2, y);
+    glVertex2f(x + width, y + height);
+    glVertex2f(x, y + height);
     glEnd();
 
     setColor(edge);
     glLineWidth(1.5f);
     glBegin(GL_LINE_LOOP);
     glVertex2f(x + 2, y);
-    glVertex2f(x + w - 2, y);
-    glVertex2f(x + w, y + h);
-    glVertex2f(x, y + h);
+    glVertex2f(x + width - 2, y);
+    glVertex2f(x + width, y + height);
+    glVertex2f(x, y + height);
     glEnd();
 
-    drawFilledRect(x - 2, y + h, w + 4, 4, { 0.5f, 0.45f, 0.4f }, edge, 1.0f);
-    drawFilledRect(x - 1, y + h + 4, w + 2, 3, { 0.6f, 0.55f, 0.5f }, edge, 1.0f);
+    drawFilledRect(x - 2, y + height, width + 4, 4, { 0.5f, 0.45f, 0.4f }, edge, 1.0f);
+    drawFilledRect(x - 1, y + height + 4, width + 2, 3, { 0.6f, 0.55f, 0.5f }, edge, 1.0f);
 }
 
-void drawCup(float x, float y, float w, float h, Color fill) {
+void drawCup(float x, float y, float width, float height, Color fill) {
     Color edge = { 0.2f, 0.2f, 0.2f };
-    drawFilledRect(x, y, w, h, fill, edge, 1.5f);
+    drawFilledRect(x, y, width, height, fill, edge, 1.5f);
 
-    float h3 = h * 0.3f, h35 = h * 0.35f, h45 = h * 0.45f;
-    float h65 = h * 0.65f, h75 = h * 0.75f, h8 = h * 0.8f;
+    float height30Percent = height * 0.3f;
+    float height35Percent = height * 0.35f;
+    float height45Percent = height * 0.45f;
+    float height65Percent = height * 0.65f;
+    float height75Percent = height * 0.75f;
+    float height80Percent = height * 0.8f;
 
     setColor(fill);
     glBegin(GL_POLYGON);
-    glVertex2f(x + w, y + h3);
-    glVertex2f(x + w + 8, y + h35);
-    glVertex2f(x + w + 8, y + h75);
-    glVertex2f(x + w, y + h8);
-    glVertex2f(x + w, y + h65);
-    glVertex2f(x + w + 4, y + h65);
-    glVertex2f(x + w + 4, y + h45);
-    glVertex2f(x + w, y + h45);
+    glVertex2f(x + width, y + height30Percent);
+    glVertex2f(x + width + 8, y + height35Percent);
+    glVertex2f(x + width + 8, y + height75Percent);
+    glVertex2f(x + width, y + height80Percent);
+    glVertex2f(x + width, y + height65Percent);
+    glVertex2f(x + width + 4, y + height65Percent);
+    glVertex2f(x + width + 4, y + height45Percent);
+    glVertex2f(x + width, y + height45Percent);
     glEnd();
 
     setColor(edge);
     glLineWidth(1.5f);
     glBegin(GL_LINE_STRIP);
-    glVertex2f(x + w, y + h3);
-    glVertex2f(x + w + 8, y + h35);
-    glVertex2f(x + w + 8, y + h75);
-    glVertex2f(x + w, y + h8);
+    glVertex2f(x + width, y + height30Percent);
+    glVertex2f(x + width + 8, y + height35Percent);
+    glVertex2f(x + width + 8, y + height75Percent);
+    glVertex2f(x + width, y + height80Percent);
     glEnd();
 
     glBegin(GL_LINE_STRIP);
-    glVertex2f(x + w, y + h45);
-    glVertex2f(x + w + 4, y + h45);
-    glVertex2f(x + w + 4, y + h65);
-    glVertex2f(x + w, y + h65);
+    glVertex2f(x + width, y + height45Percent);
+    glVertex2f(x + width + 4, y + height45Percent);
+    glVertex2f(x + width + 4, y + height65Percent);
+    glVertex2f(x + width, y + height65Percent);
     glEnd();
 }
 
-void drawBowl(float x, float y, float w, float h, Color fill) {
+void drawBowl(float x, float y, float width, float height, Color fill) {
     Color edge = { 0.2f, 0.2f, 0.2f };
-    float cx = x + w * 0.5f, cy = y + h * 0.7f;
-    float rw = w * 0.5f, rh = h * 0.5f;
+    float centerX = x + width * 0.5f;
+    float centerY = y + height * 0.7f;
+    float radiusWidth = width * 0.5f;
+    float radiusHeight = height * 0.5f;
 
     setColor(fill);
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(cx, y + h * 0.5f);
-    for (int i = 0; i <= 12; i++) {
-        float a = 3.14159f * (1.0f + (float)i / 12.0f);
-        glVertex2f(cx + cosf(a) * rw, cy + sinf(a) * rh);
+    glVertex2f(centerX, y + height * 0.5f);
+    for (int segmentIndex = 0; segmentIndex <= 12; segmentIndex++) {
+        float angle = 3.14159f * (1.0f + (float)segmentIndex / 12.0f);
+        glVertex2f(centerX + cosf(angle) * radiusWidth, centerY + sinf(angle) * radiusHeight);
     }
     glEnd();
 
-    drawFilledRect(x, cy, w, h * 0.3f, fill, edge, 0);
+    drawFilledRect(x, centerY, width, height * 0.3f, fill, edge, 0);
 
     setColor(edge);
     glLineWidth(1.5f);
     glBegin(GL_LINE_STRIP);
-    for (int i = 0; i <= 12; i++) {
-        float a = 3.14159f * (1.0f + (float)i / 12.0f);
-        glVertex2f(cx + cosf(a) * rw, cy + sinf(a) * rh);
+    for (int segmentIndex = 0; segmentIndex <= 12; segmentIndex++) {
+        float angle = 3.14159f * (1.0f + (float)segmentIndex / 12.0f);
+        glVertex2f(centerX + cosf(angle) * radiusWidth, centerY + sinf(angle) * radiusHeight);
     }
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex2f(x, cy);
-    glVertex2f(x, y + h);
-    glVertex2f(x + w, cy);
-    glVertex2f(x + w, y + h);
+    glVertex2f(x, centerY);
+    glVertex2f(x, y + height);
+    glVertex2f(x + width, centerY);
+    glVertex2f(x + width, y + height);
     glEnd();
 }
 
@@ -558,15 +564,15 @@ void drawShelvesWithItems(float x, float y) {
     Color edge = { 0.06f, 0.03f, 0.01f };
     Color woodTop = { 0.79f, 0.58f, 0.36f };
 
-    float shelfY1 = y + 80;
-    drawFilledRect(x, shelfY1, 280, 10, woodTop, edge, 2.0f);
+    float topShelfY = y + 80;
+    drawFilledRect(x, topShelfY, 280, 10, woodTop, edge, 2.0f);
 
-    drawJar(x + 20, shelfY1 + 10, 30, 35, { 0.85f, 0.8f, 0.7f });
-    drawJar(x + 60, shelfY1 + 10, 25, 30, { 0.75f, 0.85f, 0.8f });
-    drawJar(x + 95, shelfY1 + 10, 35, 40, { 0.9f, 0.85f, 0.75f });
-    drawJar(x + 145, shelfY1 + 10, 28, 32, { 0.7f, 0.8f, 0.75f });
-    drawJar(x + 185, shelfY1 + 10, 32, 38, { 0.85f, 0.82f, 0.7f });
-    drawJar(x + 230, shelfY1 + 10, 28, 34, { 0.9f, 0.88f, 0.75f });
+    drawJar(x + 20, topShelfY + 10, 30, 35, { 0.85f, 0.8f, 0.7f });
+    drawJar(x + 60, topShelfY + 10, 25, 30, { 0.75f, 0.85f, 0.8f });
+    drawJar(x + 95, topShelfY + 10, 35, 40, { 0.9f, 0.85f, 0.75f });
+    drawJar(x + 145, topShelfY + 10, 28, 32, { 0.7f, 0.8f, 0.75f });
+    drawJar(x + 185, topShelfY + 10, 32, 38, { 0.85f, 0.82f, 0.7f });
+    drawJar(x + 230, topShelfY + 10, 28, 34, { 0.9f, 0.88f, 0.75f });
 
     drawFilledRect(x, y, 300, 10, woodTop, edge, 2.0f);
 
@@ -595,13 +601,13 @@ void drawCoffeeMenuSign(float x, float y) {
     glVertex2f(x + 25, y + 95); glVertex2f(x + 75, y + 95);
     glEnd();
 
-    for (int i = 0; i < 4; i++) {
-        float ly = y + 70 - i * 18;
+    for (int lineIndex = 0; lineIndex < 4; lineIndex++) {
+        float lineY = y + 70 - lineIndex * 18;
         glBegin(GL_LINES);
-        glVertex2f(x + 15, ly);
-        glVertex2f(x + 60, ly);
+        glVertex2f(x + 15, lineY);
+        glVertex2f(x + 60, lineY);
         glEnd();
-        drawCircleFilled(x + 75, ly, 3);
+        drawCircleFilled(x + 75, lineY, 3);
     }
 }
 
@@ -626,37 +632,39 @@ void drawOrderHereSign(float x, float y) {
     glEnd();
 }
 
-void drawTable(float x, float y, float w, float h) {
+void drawTable(float x, float y, float width, float height) {
     Color edge = { 0.06f, 0.03f, 0.01f };
     Color wood = { 0.7f, 0.55f, 0.35f };
     Color woodDark = { 0.6f, 0.45f, 0.25f };
 
-    drawFilledRect(x, y + h - 10, w, 10, wood, edge, 2.0f);
-    drawFilledRect(x, y + h - 12, w, 2, woodDark, woodDark, 0);
+    drawFilledRect(x, y + height - 10, width, 10, wood, edge, 2.0f);
+    drawFilledRect(x, y + height - 12, width, 2, woodDark, woodDark, 0);
 
-    float legWidth = 8, legInset = 10;
-    drawFilledRect(x + legInset, y, legWidth, h - 10, woodDark, edge, 1.5f);
-    drawFilledRect(x + w - legInset - legWidth, y, legWidth, h - 10, woodDark, edge, 1.5f);
+    float legWidth = 8;
+    float legInset = 10;
+    drawFilledRect(x + legInset, y, legWidth, height - 10, woodDark, edge, 1.5f);
+    drawFilledRect(x + width - legInset - legWidth, y, legWidth, height - 10, woodDark, edge, 1.5f);
 }
 
-void drawStool(float x, float y, float w, float h) {
+void drawStool(float x, float y, float width, float height) {
     Color edge = { 0.06f, 0.03f, 0.01f };
     Color wood = { 0.7f, 0.55f, 0.35f };
     Color woodDark = { 0.6f, 0.45f, 0.25f };
 
-    drawFilledRect(x, y + h - 8, w, 8, wood, edge, 2.0f);
-    drawFilledRect(x + 2, y + h - 10, w - 4, 2, woodDark, woodDark, 0);
+    drawFilledRect(x, y + height - 8, width, 8, wood, edge, 2.0f);
+    drawFilledRect(x + 2, y + height - 10, width - 4, 2, woodDark, woodDark, 0);
 
-    float legWidth = 5, legInset = 6;
-    drawFilledRect(x + legInset, y, legWidth, h - 8, woodDark, edge, 1.2f);
-    drawFilledRect(x + w - legInset - legWidth, y, legWidth, h - 8, woodDark, edge, 1.2f);
+    float legWidth = 5;
+    float legInset = 6;
+    drawFilledRect(x + legInset, y, legWidth, height - 8, woodDark, edge, 1.2f);
+    drawFilledRect(x + width - legInset - legWidth, y, legWidth, height - 8, woodDark, edge, 1.2f);
 
     glLineWidth(2.0f);
     setColor(woodDark);
-    float h3 = y + h * 0.333f;
+    float crossbarY = y + height * 0.333f;
     glBegin(GL_LINES);
-    glVertex2f(x + legInset + legWidth * 0.5f, h3);
-    glVertex2f(x + w - legInset - legWidth * 0.5f, h3);
+    glVertex2f(x + legInset + legWidth * 0.5f, crossbarY);
+    glVertex2f(x + width - legInset - legWidth * 0.5f, crossbarY);
     glEnd();
 }
 
@@ -692,33 +700,33 @@ void drawPendantLamp(float x, float y) {
     drawCircleFilled(x, y - 35, 20);
 }
 
-void drawChalkboardMenu(float x, float y, float w, float h) { // Small chalkboard menu with lines and dots
+void drawChalkboardMenu(float x, float y, float width, float height) { // Small chalkboard menu with lines and dots
     Color edge = { 0.4f, 0.3f, 0.2f };
     Color board = { 0.15f, 0.15f, 0.15f };
     Color chalk = { 0.9f, 0.9f, 0.85f };
 
-    drawFilledRect(x - 8, y - 8, w + 16, h + 16, { 0.5f, 0.4f, 0.3f }, edge, 2.5f);
-    drawFilledRect(x, y, w, h, board, board, 0);
+    drawFilledRect(x - 8, y - 8, width + 16, height + 16, { 0.5f, 0.4f, 0.3f }, edge, 2.5f);
+    drawFilledRect(x, y, width, height, board, board, 0);
 
     setColor(chalk);
     glLineWidth(2.0f);
 
     glBegin(GL_LINES);
-    glVertex2f(x + 20, y + h - 25);
-    glVertex2f(x + w - 20, y + h - 25);
+    glVertex2f(x + 20, y + height - 25);
+    glVertex2f(x + width - 20, y + height - 25);
     glEnd();
 
-    float itemY = y + h - 55;
-    float w6 = w * 0.6f;
-    for (int i = 0; i < 4; i++) {
+    float itemY = y + height - 55;
+    float lineEndX = width * 0.6f;
+    for (int itemIndex = 0; itemIndex < 4; itemIndex++) {
         glBegin(GL_LINES);
         glVertex2f(x + 15, itemY);
-        glVertex2f(x + w6, itemY);
+        glVertex2f(x + lineEndX, itemY);
         glEnd();
 
-        drawCircleFilled(x + w - 25, itemY, 2);
-        drawCircleFilled(x + w - 20, itemY, 2);
-        drawCircleFilled(x + w - 15, itemY, 2);
+        drawCircleFilled(x + width - 25, itemY, 2);
+        drawCircleFilled(x + width - 20, itemY, 2);
+        drawCircleFilled(x + width - 15, itemY, 2);
 
         itemY -= 30;
     }
@@ -752,29 +760,29 @@ void drawCouchArea(float x, float y, float scale = 1.0f) {
     Color cushion = { 0.95f, 0.92f, 0.88f };
     Color armrestColor = { 0.90f, 0.87f, 0.83f };
 
-    // Uniform scaling
-    float armrestW = 12 * scale;
-    float armrestH = 60 * scale;
-    float couchW = 250 * scale;
-    float backrestH = 60 * scale;
-    float baseH = 80 * scale;
-    float backCushW1 = 120 * scale;
-    float backCushW2 = 119 * scale;
-    float backCushH = 75 * scale;
-    float seatCushW = 125 * scale;
-    float seatCushH = 30 * scale;
+    // Uniform couch scaling
+    float armrestWidth = 12 * scale;
+    float armrestHeight = 60 * scale;
+    float couchWidth = 250 * scale;
+    float backrestHeight = 60 * scale;
+    float baseHeight = 80 * scale;
+    float backCushionWidth1 = 120 * scale;
+    float backCushionWidth2 = 119 * scale;
+    float backCushionHeight = 75 * scale;
+    float seatCushionWidth = 125 * scale;
+    float seatCushionHeight = 30 * scale;
 
-    drawFilledRect(x - armrestW, y, armrestW, armrestH, armrestColor, edge, 2.0f); // Left armrest (wide and flat, same height as back)
-    drawFilledRect(x + couchW, y, armrestW, armrestH, armrestColor, edge, 2.0f); // Right armrest
+    drawFilledRect(x - armrestWidth, y, armrestWidth, armrestHeight, armrestColor, edge, 2.0f); // Left armrest
+    drawFilledRect(x + couchWidth, y, armrestWidth, armrestHeight, armrestColor, edge, 2.0f); // Right armrest
 
-    drawFilledRect(x, y, couchW, backrestH, couchColor, edge, 2.0f); // Couch base
-    drawFilledRect(x, y + 50 * scale, couchW, baseH, couchColor, edge, 2.0f); // Couch backrest
+    drawFilledRect(x, y, couchWidth, backrestHeight, couchColor, edge, 2.0f); // Couch base
+    drawFilledRect(x, y + 50 * scale, couchWidth, baseHeight, couchColor, edge, 2.0f); // Couch backrest
 
-    drawFilledRect(x + 5 * scale, y + 50 * scale, backCushW1, backCushH, cushion, edge, 1.5f); // Left back cushion
-    drawFilledRect(x + 125 * scale, y + 50 * scale, backCushW2, backCushH, cushion, edge, 1.5f); // Right back cushion
+    drawFilledRect(x + 5 * scale, y + 50 * scale, backCushionWidth1, backCushionHeight, cushion, edge, 1.5f); // Left back cushion
+    drawFilledRect(x + 125 * scale, y + 50 * scale, backCushionWidth2, backCushionHeight, cushion, edge, 1.5f); // Right back cushion
 
-    drawFilledRect(x, y + 18 * scale, seatCushW, seatCushH, cushion, edge, 1.5f); // Left seat cushion
-    drawFilledRect(x + 125 * scale, y + 18 * scale, seatCushW, seatCushH, cushion, edge, 1.5f); // Right seat cushion
+    drawFilledRect(x, y + 18 * scale, seatCushionWidth, seatCushionHeight, cushion, edge, 1.5f); // Left seat cushion
+    drawFilledRect(x + 125 * scale, y + 18 * scale, seatCushionWidth, seatCushionHeight, cushion, edge, 1.5f); // Right seat cushion
 }
 
 void drawCoffeeTable(float x, float y) {
@@ -816,10 +824,10 @@ void drawScenePixels() {
 
     glLineWidth(2.0f); // Horizontal line decor
     setColor(edge);
-    float lineY = windowHeight * 0.32f;
+    float horizontalLineY = windowHeight * 0.32f;
     glBegin(GL_LINES);
-    glVertex2f(0, lineY);
-    glVertex2f(SCENE_WIDTH, lineY);
+    glVertex2f(0, horizontalLineY);
+    glVertex2f(SCENE_WIDTH, horizontalLineY);
     glEnd();
 
     float baseY = windowHeight * 0.18f;
@@ -828,34 +836,34 @@ void drawScenePixels() {
 
     drawPlantPixel(660, baseY, (plantColorIndex + 2) % numPlantColors); // Middle plant
 
-    float paintX = 150; // Painting frame (left side of door)
-    float paintY = windowHeight * 0.49f;
-    drawFilledRect(paintX, paintY, 200, 240, { 0.3f, 0.2f, 0.1f }, edge, 3.0f);
-    drawFilledRect(paintX + 10, paintY + 10, 180, 220, { 0.95f, 0.95f, 0.9f }, edge, 2.0f);
+    float paintingX = 150; // Painting frame (left side of door)
+    float paintingY = windowHeight * 0.49f;
+    drawFilledRect(paintingX, paintingY, 200, 240, { 0.3f, 0.2f, 0.1f }, edge, 3.0f);
+    drawFilledRect(paintingX + 10, paintingY + 10, 180, 220, { 0.95f, 0.95f, 0.9f }, edge, 2.0f);
 
     setColor({ 0.8f, 0.3f, 0.4f }); // Painting circles
-    drawCircleFilled(paintX + 100, windowHeight * 0.62f, 40);
+    drawCircleFilled(paintingX + 100, windowHeight * 0.62f, 40);
     setColor({ 0.3f, 0.6f, 0.8f });
-    drawCircleFilled(paintX + 80, windowHeight * 0.58f, 30);
+    drawCircleFilled(paintingX + 80, windowHeight * 0.58f, 30);
     setColor({ 0.9f, 0.7f, 0.2f });
-    drawCircleFilled(paintX + 120, windowHeight * 0.6f, 25);
+    drawCircleFilled(paintingX + 120, windowHeight * 0.6f, 25);
 
     drawEntryArea(400, baseY); // Entry door
     drawWindowPixel(700, midY, 220, 260, curtainOpenAmount); // Window
 
     float counterX = 1150; // Counter setup
-    float counterW = windowWidth * 0.52f;
-    float counterH = windowHeight * 0.22f;
-    float counterTop = baseY + counterH;
+    float counterWidth = windowWidth * 0.52f;
+    float counterHeight = windowHeight * 0.22f;
+    float counterTop = baseY + counterHeight;
 
-    drawCountertopStyled(counterX - 8, counterTop, counterW + 16, 22);
-    drawCounterStyled(counterX, baseY, counterW, counterH);
+    drawCountertopStyled(counterX - 8, counterTop, counterWidth + 16, 22);
+    drawCounterStyled(counterX, baseY, counterWidth, counterHeight);
 
     drawCoffeeMachineStyled(counterX + 70, counterTop + 6, 1.0f); // Coffee machine
     drawBrownCoffeeMakerStyled(counterX + 220, counterTop + 6, 1.0f); // Coffee maker
     drawMug(counterX + 320, counterTop + 8, { 0.75f, 0.9f, 0.8f }); // Mug with steam
     drawMug(counterX + 360, counterTop + 8, { 0.9f, 0.75f, 0.6f }); // Mug
-    drawCashRegisterPixel(counterX + counterW - 120, counterTop + 6, 1.0f); // Cash register
+    drawCashRegisterPixel(counterX + counterWidth - 120, counterTop + 6, 1.0f); // Cash register
 
     drawShelvesWithItems(counterX + 380, upperY); // Wall decorations and signs
     drawCoffeeMenuSign(counterX + 730, windowHeight * 0.60f);
@@ -909,8 +917,8 @@ void spawnSmoke(float x, float y) {
     smokeParticles.push_back(s);
 }
 
-void updateSmoke(float dt) {
-    smokeTimer += dt;
+void updateSmoke(float deltaTime) {
+    smokeTimer += deltaTime;
     if (smokeTimer >= 0.25f) {
         float mugX = 1150 + 320; // Mug position
         float mugY = windowHeight * 0.18f + windowHeight * 0.22f + 8;
@@ -918,21 +926,21 @@ void updateSmoke(float dt) {
         smokeTimer = 0.0f;
     }
 
-    for (int i = (int)smokeParticles.size() - 1; i >= 0; --i) {
-        Smoke& s = smokeParticles[i];
-        s.life -= dt * 0.4f;
-        s.y += dt * 40.0f;
-        s.x += s.offsetX * dt * 60.0f;
-        if (s.life <= 0)
-            smokeParticles.erase(smokeParticles.begin() + i);
+    for (int particleIndex = (int)smokeParticles.size() - 1; particleIndex >= 0; --particleIndex) {
+        Smoke& particle = smokeParticles[particleIndex];
+        particle.life -= deltaTime * 0.4f;
+        particle.y += deltaTime * 40.0f;
+        particle.x += particle.offsetX * deltaTime * 60.0f;
+        if (particle.life <= 0)
+            smokeParticles.erase(smokeParticles.begin() + particleIndex);
     }
 }
 
 void drawSmokePixels() {
-    for (auto& s : smokeParticles) {
-        float a = s.life * 0.6f;
-        glColor4f(0.9f, 0.9f, 0.9f, a);
-        drawCircleFilled(s.x, s.y, 6.0f + (1.0f - s.life) * 10.0f);
+    for (auto& particle : smokeParticles) {
+        float alpha = particle.life * 0.6f;
+        glColor4f(0.9f, 0.9f, 0.9f, alpha);
+        drawCircleFilled(particle.x, particle.y, 6.0f + (1.0f - particle.life) * 10.0f);
     }
 }
 
@@ -953,9 +961,9 @@ void display() {
     glutSwapBuffers();
 }
 
-void onResize(int w, int h) {
-    windowWidth = max(200, w);
-    windowHeight = max(120, h);
+void onResize(int width, int height) {
+    windowWidth = max(200, width);
+    windowHeight = max(120, height);
 
     glViewport(0, 0, windowWidth, windowHeight);
     glMatrixMode(GL_PROJECTION);
@@ -974,17 +982,17 @@ void mouse(int button, int state, int x, int y) {
     if (state == GLUT_DOWN) {
         if (button == GLUT_LEFT_BUTTON) {
             catRotationAngle += 15.0f; // Rotate cat by 15 degrees
-            catColorIndex = (catColorIndex + 1) % numCatColors; // Change color
+            catColorIndex = (catColorIndex + 1) % numCatColors; // Change color every time LMB is clicked
             glutPostRedisplay();
         }
         else if (button == GLUT_RIGHT_BUTTON)
             plantColorIndex = (plantColorIndex + 1) % numPlantColors;
         else if (button == 3) { // Scroll wheel up
-            couchScale = min(2.0f, couchScale + 0.1f); // Increase scale, max 2.0
+            couchScale = min(2.0f, couchScale + 0.1f); // Increase scale, max scale is 2.0
             glutPostRedisplay();
         }
         else if (button == 4) { // Scroll wheel down
-            couchScale = max(0.5f, couchScale - 0.1f); // Decrease scale, min 0.5
+            couchScale = max(0.5f, couchScale - 0.1f); // Decrease scale, min scale is 0.5
             glutPostRedisplay();
         }
     }
